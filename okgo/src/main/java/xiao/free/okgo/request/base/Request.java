@@ -388,7 +388,7 @@ public abstract class Request<T, R extends Request> implements Serializable {
         HttpUtils.checkNotNull(callback, "callback == null");
 
         this.callback = callback;
-        Call<T> call = adapt();
+        call = adapt();
         call.execute(callback);
     }
 }

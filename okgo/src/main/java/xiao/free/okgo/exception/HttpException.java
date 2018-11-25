@@ -38,13 +38,6 @@ public class HttpException extends RuntimeException {
         super(message);
     }
 
-    public HttpException(Response<?> response) {
-        super(getMessage(response));
-        this.code = response.code();
-        this.message = response.message();
-        this.response = response;
-    }
-
     private static String getMessage(Response<?> response) {
         HttpUtils.checkNotNull(response, "response == null");
         return "HTTP " + response.code() + " " + response.message();

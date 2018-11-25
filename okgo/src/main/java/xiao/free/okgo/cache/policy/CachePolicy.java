@@ -39,10 +39,10 @@ public interface CachePolicy<T> {
 
     /**
      * 获取数据失败的回调
-     *
-     * @param error 失败的信息，可是是缓存或者网络
+     * @param code 错误码
+     * @param msg 失败的信息
      */
-    void onError(Response<T> error);
+    void onError(final int code, final String msg);
 
     /**
      * 控制是否执行后续的回调动作

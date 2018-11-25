@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.ext.androidCompileSdkVersion
     defaultConfig {
         applicationId "com.okhttp.demo"
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion rootProject.ext.androidMinSdkVersion
+        targetSdkVersion rootProject.ext.androidTargetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -18,8 +18,10 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-
+    def appDependence = rootProject.ext.app
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation appDependence.appcompat
+    implementation appDependence.constraintLayout
+    implementation appDependence.gson
+    implementation project(':okgo')
 }

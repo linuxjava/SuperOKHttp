@@ -17,6 +17,7 @@ package xiao.free.okgo.cache.policy;
 
 import xiao.free.okgo.cache.CacheEntity;
 import xiao.free.okgo.callback.Callback;
+import xiao.free.okgo.model.ErrorCode;
 import xiao.free.okgo.model.Response;
 import xiao.free.okgo.request.base.Request;
 
@@ -33,28 +34,6 @@ public class NoneCacheRequestPolicy<T> extends BaseCachePolicy<T> {
 
     public NoneCacheRequestPolicy(Request<T, ? extends Request> request) {
         super(request);
-    }
-
-    @Override
-    public void onSuccess(final Response<T> success) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onSuccess(success);
-                mCallback.onFinish();
-            }
-        });
-    }
-
-    @Override
-    public void onError(final Response<T> error) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onError(error);
-                mCallback.onFinish();
-            }
-        });
     }
 
     @Override
@@ -85,13 +64,12 @@ public class NoneCacheRequestPolicy<T> extends BaseCachePolicy<T> {
                 try {
                     prepareRawCall();
                 } catch (Throwable throwable) {
-                    Response<T> error = Response.error(false, rawCall, null, throwable);
-                    mCallback.onError(error);
+                    onError(ErrorCode.getErrorCode(throwable), throwable.toString());
                     return;
                 }
                 if (cacheEntity != null) {
                     Response<T> success = Response.success(true, cacheEntity.getData(), rawCall, null);
-                    mCallback.onCacheSuccess(success);
+                    mCallback.onSuccess(success);
                     mCallback.onFinish();
                     return;
                 }

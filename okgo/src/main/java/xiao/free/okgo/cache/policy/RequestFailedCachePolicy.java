@@ -17,6 +17,7 @@ package xiao.free.okgo.cache.policy;
 
 import xiao.free.okgo.cache.CacheEntity;
 import xiao.free.okgo.callback.Callback;
+import xiao.free.okgo.model.ErrorCode;
 import xiao.free.okgo.model.Response;
 import xiao.free.okgo.request.base.Request;
 
@@ -36,25 +37,13 @@ public class RequestFailedCachePolicy<T> extends BaseCachePolicy<T> {
     }
 
     @Override
-    public void onSuccess(final Response<T> success) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onSuccess(success);
-                mCallback.onFinish();
-            }
-        });
-    }
-
-    @Override
-    public void onError(final Response<T> error) {
-
+    public void onError(final int code, final String msg) {
         if (cacheEntity != null) {
-            final Response<T> cacheSuccess = Response.success(true, cacheEntity.getData(), error.getRawCall(), error.getRawResponse());
+            final Response<T> cacheSuccess = Response.success(true, cacheEntity.getData(), rawCall, null);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mCallback.onCacheSuccess(cacheSuccess);
+                    mCallback.onSuccess(cacheSuccess);
                     mCallback.onFinish();
                 }
             });
@@ -62,7 +51,7 @@ public class RequestFailedCachePolicy<T> extends BaseCachePolicy<T> {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mCallback.onError(error);
+                    mCallback.onError(code, msg);
                     mCallback.onFinish();
                 }
             });
@@ -94,8 +83,7 @@ public class RequestFailedCachePolicy<T> extends BaseCachePolicy<T> {
                 try {
                     prepareRawCall();
                 } catch (Throwable throwable) {
-                    Response<T> error = Response.error(false, rawCall, null, throwable);
-                    mCallback.onError(error);
+                    onError(ErrorCode.getErrorCode(throwable), throwable.toString());
                     return;
                 }
                 requestNetworkAsync();

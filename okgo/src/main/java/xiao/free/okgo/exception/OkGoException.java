@@ -15,6 +15,8 @@
  */
 package xiao.free.okgo.exception;
 
+import xiao.free.okgo.model.ErrorCode;
+
 /**
  * ================================================
  * 作    者：
@@ -26,20 +28,19 @@ package xiao.free.okgo.exception;
  */
 public class OkGoException extends Exception {
     private static final long serialVersionUID = -8641198158155821498L;
+    private int code;
+    private String message;
 
-    public OkGoException(String detailMessage) {
-        super(detailMessage);
+    public int getCode() {
+        return code;
     }
 
-    public static OkGoException UNKNOWN() {
-        return new OkGoException("unknown exception!");
+    public OkGoException(int code, String message) {
+        super(message);
+        this.code = code;
     }
 
-    public static OkGoException BREAKPOINT_NOT_EXIST() {
-        return new OkGoException("breakpoint file does not exist!");
-    }
-
-    public static OkGoException BREAKPOINT_EXPIRED() {
-        return new OkGoException("breakpoint file has expired!");
+    public static OkGoException REQUEST_ALREADY_EXECUTED() {
+        return new OkGoException(ErrorCode.CODE_REQUEST_ALREADY_EXECUTED, "Request Already executed!");
     }
 }

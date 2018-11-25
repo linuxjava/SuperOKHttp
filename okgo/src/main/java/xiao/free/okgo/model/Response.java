@@ -28,10 +28,9 @@ import okhttp3.Headers;
  * ================================================
  */
 public final class Response<T> {
-
-    private T body;
-    private Throwable throwable;
-    private boolean isFromCache;
+    private T body;//访问成功时不为空
+    private Throwable throwable;//异常时不为空
+    private boolean isFromCache;//是否来自缓存
     private okhttp3.Call rawCall;
     private okhttp3.Response rawResponse;
 

@@ -56,7 +56,7 @@ public class OkGo {
     public static final long DEFAULT_MILLISECONDS = 30000;      //默认的超时时间
     public static long REFRESH_TIME = 300;                      //回调刷新时间（单位ms）
 
-    private Application context;            //全局上下文
+    private Context context;            //全局上下文
     private Handler mDelivery;              //用于在主线程执行的调度器
     private OkHttpClient okHttpClient;      //ok请求的客户端
     private HttpParams mCommonParams;       //全局公共请求参数
@@ -154,8 +154,8 @@ public class OkGo {
     /**
      * 必须在全局Application先调用，获取context上下文，否则缓存无法使用
      */
-    public OkGo init(Application app) {
-        context = app;
+    public OkGo init(Context c) {
+        context = c;
         return this;
     }
 

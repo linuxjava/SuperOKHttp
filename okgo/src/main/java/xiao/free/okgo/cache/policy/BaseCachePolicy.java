@@ -23,6 +23,8 @@ import xiao.free.okgo.cache.CacheMode;
 import xiao.free.okgo.callback.Callback;
 import xiao.free.okgo.db.CacheManager;
 import xiao.free.okgo.exception.HttpException;
+import xiao.free.okgo.exception.OkGoException;
+import xiao.free.okgo.model.ErrorCode;
 import xiao.free.okgo.model.Response;
 import xiao.free.okgo.request.base.Request;
 import xiao.free.okgo.utils.HeaderParser;
@@ -58,6 +60,35 @@ public abstract class BaseCachePolicy<T> implements CachePolicy<T> {
     }
 
     @Override
+    public void onSuccess(final Response<T> success) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mCallback.onSuccess(success);
+                mCallback.onFinish();
+            }
+        });
+    }
+
+    @Override
+    public void onError(final int code, final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mCallback.onError(code, msg);
+                mCallback.onFinish();
+            }
+        });
+    }
+
+    /**
+     * 处理304cache或其它HTTP错误码
+     *
+     * @param call     请求的对象
+     * @param response 响应的对象
+     * @return
+     */
+    @Override
     public boolean onAnalysisResponse(Call call, okhttp3.Response response) {
         return false;
     }
@@ -90,7 +121,7 @@ public abstract class BaseCachePolicy<T> implements CachePolicy<T> {
 
     @Override
     public synchronized okhttp3.Call prepareRawCall() throws Throwable {
-        if (executed) throw HttpException.COMMON("Already executed!");
+        if (executed) throw OkGoException.REQUEST_ALREADY_EXECUTED();
         executed = true;
         rawCall = request.getRawCall();
         if (canceled) rawCall.cancel();
@@ -140,34 +171,30 @@ public abstract class BaseCachePolicy<T> implements CachePolicy<T> {
                     }
                 } else {
                     if (!call.isCanceled()) {
-                        Response<T> error = Response.error(false, call, null, e);
-                        onError(error);
+                        onError(ErrorCode.getErrorCode(e), e.toString());
                     }
                 }
             }
 
             @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+            public void onResponse(okhttp3.Call call, okhttp3.Response response) {
                 int responseCode = response.code();
 
-                //network error
-                if (responseCode == 404 || responseCode >= 500) {
-                    Response<T> error = Response.error(false, call, response, HttpException.NET_ERROR());
-                    onError(error);
-                    return;
-                }
+                if (responseCode == 200) {
+                    try {
+                        T body = request.getConverter().convertResponse(response);
+                        //save cache when request is successful
+                        saveCache(response.headers(), body);
+                        Response<T> success = Response.success(false, body, call, response);
+                        onSuccess(success);
+                    } catch (Throwable throwable) {
+                        onError(ErrorCode.getErrorCode(throwable), throwable.toString());
+                    }
+                } else {
+                    //network error
+                    if (onAnalysisResponse(call, response)) return;
 
-                if (onAnalysisResponse(call, response)) return;
-
-                try {
-                    T body = request.getConverter().convertResponse(response);
-                    //save cache when request is successful
-                    saveCache(response.headers(), body);
-                    Response<T> success = Response.success(false, body, call, response);
-                    onSuccess(success);
-                } catch (Throwable throwable) {
-                    Response<T> error = Response.error(false, call, response, throwable);
-                    onError(error);
+                    onError(responseCode, response.message());
                 }
             }
         });

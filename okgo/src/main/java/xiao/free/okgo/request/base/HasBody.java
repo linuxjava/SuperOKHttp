@@ -59,9 +59,12 @@ public interface HasBody<R> {
 
     R upJson(String json);
 
-    R upJson(JSONObject jsonObject);
-
-    R upJson(JSONArray jsonArray);
+    /**
+     * 将JavaBean转换为JSON字符串
+     * @param Object
+     * @return
+     */
+    R upJson(Object Object);
 
     R upBytes(byte[] bs);
 

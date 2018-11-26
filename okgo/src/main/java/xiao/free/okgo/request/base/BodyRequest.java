@@ -16,9 +16,11 @@
 package xiao.free.okgo.request.base;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import xiao.free.okgo.model.HttpHeaders;
 import xiao.free.okgo.model.HttpParams;
+import xiao.free.okgo.utils.GsonUtils;
 import xiao.free.okgo.utils.HttpUtils;
 import xiao.free.okgo.utils.OkLogger;
 
@@ -59,6 +61,11 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         super(url);
     }
 
+    /**
+     * 是否强制使用Multipart格式
+     * @param isMultipart
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R isMultipart(boolean isMultipart) {
@@ -66,6 +73,11 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
+    /**
+     * 在当前请求的url上拼接上body中的参数
+     * @param isSpliceUrl
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R isSpliceUrl(boolean isSpliceUrl) {
@@ -145,20 +157,15 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
-    @SuppressWarnings("unchecked")
+    /**
+     * 将JavaBean转换为JSON字符串
+     * @param Object
+     * @return
+     */
     @Override
-    public R upJson(JSONObject jsonObject) {
-        this.content = jsonObject.toString();
-        this.mediaType = HttpParams.MEDIA_TYPE_JSON;
-        return (R) this;
-    }
-
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
-    @SuppressWarnings("unchecked")
-    @Override
-    public R upJson(JSONArray jsonArray) {
-        this.content = jsonArray.toString();
+    public R upJson(Object Object) {
+        this.content = GsonUtils.toJson(Object);
+        Log.d("xiao1", content);
         this.mediaType = HttpParams.MEDIA_TYPE_JSON;
         return (R) this;
     }

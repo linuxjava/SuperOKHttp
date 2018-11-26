@@ -15,7 +15,6 @@
  */
 package xiao.free.okgo.convert;
 
-
 import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;

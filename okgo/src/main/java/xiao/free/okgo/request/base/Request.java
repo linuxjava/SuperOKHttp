@@ -30,6 +30,7 @@ import xiao.free.okgo.convert.Converter;
 import xiao.free.okgo.model.HttpHeaders;
 import xiao.free.okgo.model.HttpMethod;
 import xiao.free.okgo.model.HttpParams;
+import xiao.free.okgo.utils.GsonUtils;
 import xiao.free.okgo.utils.HttpUtils;
 
 import java.io.IOException;
@@ -232,6 +233,18 @@ public abstract class Request<T, R extends Request> implements Serializable {
     @SuppressWarnings("unchecked")
     public R params(String key, boolean value, boolean... isReplace) {
         params.put(key, value, isReplace);
+        return (R) this;
+    }
+
+    /**
+     * 支持自动将JavaBean转为Json字符串
+     * @param key
+     * @param object JavaBean
+     * @param isReplace
+     * @return
+     */
+    public R params(String key, Object object, boolean... isReplace) {
+        params.put(key, GsonUtils.toJson(object), isReplace);
         return (R) this;
     }
 

@@ -8,7 +8,7 @@ public class ResponseTest2 {
     @SerializedName("code")
     public int code;
     @SerializedName("msg")
-    public String msg;
+    public String msg = "asdfadf";
     @SerializedName("data")
     public List<Data> dataList;
 

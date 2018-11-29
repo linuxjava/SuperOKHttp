@@ -60,10 +60,12 @@ public class ErrorCode {
         } else if (e instanceof IllegalStateException) {//JSON转换解析错误，例如Expected a string but was BEGIN_OBJECT
             code = CODE_GSON_ERR;
             msg = "GSON实体错误";
-        } else if (e instanceof ErrnoException) {//未获取网络权限
-            code = CODE_PERMISSION_DENIED;
-            msg = "Permission denied";
-        } else if (e instanceof UnknownHostException) {//网络无法访问
+        }
+//        else if (e instanceof ErrnoException) {//未获取网络权限
+//            code = CODE_PERMISSION_DENIED;
+//            msg = "Permission denied";
+//        }
+        else if (e instanceof UnknownHostException) {//网络无法访问
             code = CODE_UNKNOWN_HOST;
             msg = "网络无法访问";
         } else if (e instanceof FileNotFoundException) {//文件上传无法找到文件

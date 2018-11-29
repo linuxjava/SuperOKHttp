@@ -37,39 +37,6 @@ public class NoCachePolicy<T> extends BaseCachePolicy<T> {
     }
 
     @Override
-    public void onSuccess(final Response<T> success) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onSuccess(success);
-                mCallback.onFinish();
-            }
-        });
-    }
-
-//    @Override
-//    public void onError(final Response<T> error) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                mCallback.onError(error);
-//                mCallback.onFinish();
-//            }
-//        });
-//    }
-
-    @Override
-    public void onError(final int code, final String msg) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onError(code, msg);
-                mCallback.onFinish();
-            }
-        });
-    }
-
-    @Override
     public Response<T> requestSync(CacheEntity<T> cacheEntity) {
         try {
             prepareRawCall();
